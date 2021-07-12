@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>숫자야구</title>
+    <style>
+      #div_correct { width:100px; height:50px; margin-top: 30px;border:1px solid black;}
+      #div_logs {width:400px; height:auto; margin-top: 30px;border:1px solid black;}
+    </style>
+</head>
+<body>
+  <form id="form" onsubmit="return false;">
+    <input type="text" id="input"/>
+    <button>확인</button>
+  </form>
+  <div id="div_correct" >정답: <span id="correct"></span></div>
+  <div id="div_logs">기록: <span id="logs"></span></div>
+
+  <script>
+    "use strict"
+
+    //정의부
+    let strike = 0; //스트라이크
+    let ball = 0; //안타
+    let chance = 10;
+
+    let correct = document.querySelector('#correct');
+    let input = document.querySelector('#input');
+    let button = document.querySelector('button');
+    let logs = document.querySelector('#logs');
+    
+    //숫자뽑기, 최소값과 최대값 지정한 난수뽑기 : ( Math.random() * ( 최대값 - 최소값 )  ) + 최소값
+    correct.textContent = parseInt(Math.random() * (9999 - 1000) + 1000);
+    correct.style.display = 'none'; //정답을 맞추기 전까지 결과를 숨기기
+
+    //실행부
+    button.addEventListener('click', () => {
+      if (typeof(input.value) != 'number' && input.value.length != 4){
+        alert('4자리의 정수를 입력해주세요.');
+      } else {
+        if (input.value === correct.textContent) {
+          logs.textContent = `${input.value}, 결과: 홈런`
+          alert('홈런입니다.😎');
+          correct.style.display = 'block'; //정답을 맞추면 결과를 보이기
+          return;
+        } else{
+          if (chance > 0) {
+            for(let i=0; i<4; i++) {
+              if (input.value[i] === correct.textContent[i] & i == i) {
+                strike += 1;
+              } else if (input.value[i] === correct.textContent[i] | i != i) {
+                ball += 1;
+              } else if (input.value === correct.textContent) {
+                logs.textContent = `${input.value}, 결과: 홈런`
+                alert('홈런입니다.😎');
+                correct.style.display = 'block'; //정답을 맞추면 결과를 보이기
+                return;
+              }
+            } //end of for
+            logs.textContent = `${input.value}, 결과: ${strike}스트라이크 ${ball}볼, 남은 기회: ${chance-1}`
+            chance -= 1;
+          } else {
+            correct.style.display = 'block'; //실패하면 결과 보여주기
+            alert('Out! You lost!');
+          }
+           
+        }
+      } //end of type check
+    })
+    
+
+
+
+
+
+
+  </script>
+</body>
+</html>
