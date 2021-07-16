@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>로또 추첨기</title>
+  <style>
+    .ball { 
+      display: inline-block;
+      border:1px solid black;
+      border-radius: 20px;
+      width: 40px;
+      height: 40px;
+      line-height: 40px;
+      font-size: 20px; 
+      text-align: center;
+      margin-right: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="result">추첨결과는? </div>
+  <div id="bonus">보너스: </div>
+
+
+  <script>
+    "use strict"
+
+    //정의부
+    let choiced_balls = 0; //일반 공
+    let choiced_bonus = 0; //보너스 공
+
+    const result = document.querySelector('#result');
+    const bonus = document.querySelector('#bonus');
+
+    //실행부
+    const balls = Array(45).fill().map((v, idx) => { // 공 45개를 미리 뽑기
+      return idx + 1;
+    })
+
+    const drawBall = (number, parent) => { //공 화면에 그리기
+        const ball = document.createElement('div');
+        ball.classList.add = 'ball';
+        ball.textContent = number;
+        parent.appendChild(ball);
+    };
+
+    function passSec() {
+      const sixSec = window.setInterval(() => {  //일반 공 6개를 뽑는 타이머
+        drawBall(choiced_balls, result);
+        if (balls.length <= 39) { //공의 개수가 6개가 뽑히면 
+          window.clearInterval(sixSec); // 타이머 중지
+        }
+      }, 1000);
+
+      const oneSec = window.setTimeout(() => { //보너스 공 1개를 뽑는 타이머
+        drawBall(choiced_bonus, bonus);
+        if (balls.length <= 44) { //공의 개수가 1개가 뽑히면
+          window.clearInterval(oneSec); // 타이머 중지
+        }
+      }, 7000);
+    }
+
+    passSec();
+
+   
+
+
+  </script>
+</body>
+</html>

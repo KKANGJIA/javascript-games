@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>가위바위보</title>
+    <script src="https://kit.fontawesome.com/6b4de952c8.js" crossorigin="anonymous"></script>
+    <style>
+        #computer{
+            width: 142px;
+            height: 200px;
+        }
+    </style>
+</head>
+<body>
+  <div id="computer"></div>
+  <div>
+    <button id="scissors" class="btn">가위</button>
+    <button id="rock" class="btn">바위</button>
+    <button id="paper" class="btn">보</button>
+  </div>
+  <div id="score">0</div>
+
+  <script>
+    "use strict"
+
+    ///정의부
+    const computer = document.querySelector('#computer');
+    const scissors = document.querySelector('#scissors');
+    const rock = document.querySelector('#rock');
+    const paper = document.querySelector('#paper');
+    const btn = document.querySelectorAll('.btn');
+    
+    const rspTags = {scissors: '<i class="far fa-hand-scissors" style="font-size: 100px;"></i>',
+      rock: '<i class="far fa-hand-rock" style="font-size: 100px;"></i>',
+      paper: '<i class="far fa-hand-paper" style="font-size: 100px;"></i>'
+    };
+    
+      let computerChoice = 'scissors';
+      const changeComputerHand = () => {
+        if (computerChoice === 'rock') { // 바위면
+          computerChoice = 'scissors';
+        } else if (computerChoice === 'scissors') { // 가위면
+          computerChoice = 'paper';
+        } else if (computerChoice === 'paper') { // 보면
+          computerChoice = 'rock';
+        }
+        computer.innerHTML = rspTags[computerChoice];
+      }
+      let intervalId = setInterval(changeComputerHand, 50);  
+    
+
+    const clickButton = () => { // 버튼 클릭하면
+      clearInterval(intervalId); // 잠시 게임을 중단하고(for 결과판단)
+      setTimeout(() => { // 1초 후에 다시 게임 재개
+        let intervalId = setInterval(changeComputerHand, 50);  
+      }, 1000)
+
+      if 
+    }
+
+    rock.addEventListener('click', clickButton);
+    scissors.addEventListener('click', clickButton);
+    paper.addEventListener('click', clickButton);
+
+
+
+  </script>
+</body>
+</html>
