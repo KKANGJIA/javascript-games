@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>카드 짝맞추기</title>
+    <style>
+        #wapper{
+            width:400px;
+            text-align: center;
+            margin:auto;
+        }
+        .card{ 
+            display: inline-block;
+            margin-right: 20px;
+            margin-bottom: 20px;
+            width:70px;
+            height:100px;
+            perspective: 140px;
+        }
+
+        .card-inner{
+            position: relative;
+            width:100%;
+            height:100%;
+            text-align: center;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+        .card.flipped .card-inner{
+            transform: rotateY(180deg);
+        }
+        .card-front{
+            background: navy;
+        }
+        .card-front, .card-back{
+            position: absolute; /*두 카드를 겹치기 위함*/
+            width:100%;
+            height:100%;
+            border: 1px solid black;
+            backface-visibility: hidden;
+        }
+        .card-back{
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body>
+    <div id="wapper"></div>
+    <script>
+      const wapper = document.querySelector('#wapper');
+
+      const total = 12;
+      const colors = ['orange', 'green', 'yellow', 'red', 'blue', 'purple'];
+      let colorCopy = colors.concat(colors); 
+      // 같은 색 두개의 카드를 만들기 위한 concat
+      // concat 원본을 수정하지 않고 새배열을 반환함
+      // concat()만 하면 얕은 복사를 할 수 있지만 본래의 역할이 아니니까 spread 연산자를 권장함
+      let shuffled = []; // 카드 색을 랜덤으로 섞어서 배열을 만들기 위함
+      let clicked = []; // 클릭한 카드를 저장
+      let completed = []; // 같은 색 카드를 저장
+      let clickable = false; // 클릭가능함을 지정하는 변수(프로그램 보안용)
+
+      function shuffle() { //피셔-예이츠 셔플
+        for(let i=0; colorCopy.length>0; i+=1){
+            const randomIndex = Math.floor(Math.random()*colorCopy.length);
+            shuffled = shuffled.concat(colorCopy.splice(randomIndex, 1)); //splice해서 기존 suffled에 합친 걸 배열을 새롭게 반환
+            // [1].concat([2]) // 결과: [1, 2], 배열인 경우만 합쳐줌(객체 제외)
+            
+        }
+      }
+      
+      function createCard(i){
+        const card = document.createElement('div');
+        card.classList.add('card');
+        
+        const cardInner = document.createElement('div');
+        cardInner.classList.add('card-inner');
+        
+        const cardFront = document.createElement('div');
+        const cardBack = document.createElement('div'); 
+        cardFront.classList.add('card-front');
+        cardBack.classList.add('card-back');
+         
+        //카드 색깔 랜덤으로 배치(2장씩)
+        cardBack.style.backgroundColor = shuffled[i];
+
+        cardInner.appendChild(cardFront);
+        cardInner.appendChild(cardBack);           
+        card.appendChild(cardInner)
+        return card;
+      }
+
+      function startGame(){
+        clickable = false; // 시작 시 클릭막기
+        shuffle();
+        // 반복문으로 만든 카드를 12개로 만들고 화면에 하나씩 넣기
+        for(let i=0; i<total; i+=1){
+          const card = createCard(i);
+          card.addEventListener('click', onClickCard);
+          wapper.appendChild(card);
+        }
+
+        document.querySelectorAll('.card').forEach((card, idx)=>{ //초반 카드 공개
+          setTimeout(()=>{
+            card.classList.add('flipped');
+          }, 1000 + 100 * idx); // 1초 후에 카드가 뒤집히기 시작하고 0.1초 후마다 다른 카드가 계속 뒤집힘
+        }) 
+        setTimeout(()=>{ // 카드 감추기
+          document.querySelectorAll('.card').forEach((card)=>{
+            card.classList.remove('flipped');
+          });
+          clickable = true;
+          }, 5000);
+      }
+
+      function onClickCard() {
+        if (!clickable || completed.includes(this) || clicked[0] === this){
+          return; // 클릭을 할 수 없거나 현재 카드가 완성 배열에 포함되어 있거나 현재 카드가 클릭된 상태라면 바로 return
+        }
+        this.classList.toggle('flipped'); // event.target.classList.toggle('flipped');
+        //this.classList.add('flipped'); , toggle이면 카드가 앞으로 뒤로 계속 클릭가능, add는 한번만 뒤집히고 계속 클릭 불가능
+        clicked.push(this); //event.target
+
+        if (clicked.length !== 2){
+          return;
+        }
+        
+        if (clicked[0].querySelector('.card-back').style.backgroundColor === clicked[1].querySelector('.card-back').style.backgroundColor) {
+          completed.push(clicked[0]);
+          completed.push(clicked[1]);
+          clicked = [];
+          // 위의 세코드를 합친 코드, completed = completed.concat(clicked);
+          // 성능 차이는 이중 반복문에서 고민하는 것, push와 concat에서는 크지 않음
+          if(completed.length !== total){
+            return;
+          }
+          //if문 중첩되지 않기위해서 빠르게 return하는 것
+          setTimeout(()=>{
+            alert('축하합니다!');
+            resetGame();
+          },1000)
+          return;
+        }
+        clickable = false; // 버그해결, 4개를 동시에 클릭하지 못하고 두개만 클릭이 가능하도록
+        setTimeout(()=> {
+          clicked[0].classList.remove('flipped');
+          clicked[1].classList.remove('flipped');
+          clicked = [];
+          clickable = true;
+        }, 1000)
+      }
+
+      startGame();
+
+      function resetGame() {
+        wapper.innerHTML = '';
+        colorCopy = colors.concat(colors); 
+        //원본안바꾸는 애들이 재사용에 좋음
+        //원본 바꾸는 메서드: sort, push, pop, unshift, shift, splice 등은 colors와 사용하면 x
+        shuffled = [];
+        completed = [];
+        startGame();
+      }
+    </script>
+</body>
+</html>

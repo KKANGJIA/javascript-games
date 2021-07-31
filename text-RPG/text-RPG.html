@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>텍스트 RPG</title>
+</head>
+<body>
+  <form id="start-screen">
+    <input id="name-input" placeholder="주인공 이름을 입력하세요!" />
+    <button id="start">시작</button>
+  </form>
+  <div id="screen">
+  <div id="hero-stat">
+    <span id="hero-name"></span>
+    <span id="hero-level"></span>
+    <span id="hero-hp"></span>
+    <span id="hero-xp"></span>
+    <span id="hero-att"></span>
+  </div>
+  <form id="game-menu" style="display: none;">
+    <div id="menu-1">1.모험</div>
+    <div id="menu-2">2.휴식</div>
+    <div id="menu-3">3.종료</div>
+    <input id="menu-input" />
+    <button id="menu-button">입력</button>
+  </form>
+  <form id="battle-menu" style="display: none;">
+    <div id="battle-1">1.공격</div>
+    <div id="battle-2">2.회복</div>
+    <div id="battle-3">3.도망</div>
+    <input id="battle-input" />
+    <button id="battle-button">입력</button>
+  </form>
+  <div id="message"></div>
+  <div id="monster-stat">
+    <span id="monster-name"></span>
+    <span id="monster-hp"></span>
+    <span id="monster-att"></span>
+  </div>
+  </div>
+
+  <script>
+  const startScreenTag = document.querySelector('#start-screen');
+  const gameMenuTag = document.querySelector('#game-menu');
+  const battleMenuTag = document.querySelector('#battle-menu');
+  const heroNameTag = document.querySelector('#hero-name');
+  const heroLevelTag = document.querySelector('#hero-level');
+  const heroHpTag = document.querySelector('#hero-hp');
+  const heroXpTag = document.querySelector('#hero-xp');
+  const heroAttTag = document.querySelector('#hero-att');
+  const monsterNameTag = document.querySelector('#monster-name');
+  const monsterHpTag = document.querySelector('#monster-hp');
+  const monsterAttTag = document.querySelector('#monster-att');
+  const messageTag = document.querySelector('#message');
+
+  // 변수명은 처음부터 제대로 지어야 코드가 길어질 수록 중복이 안됨
+  // 하나의 객체에 다 포함되는 속성이므로 객체로 생성
+  const hero = {
+    name: '', 
+    lev: 1,
+    maxHp: 100,
+    hp: 100, 
+    xp: 0, // 경험치, 15레벨마다 레벨업이 진행
+    // maxXp
+    att: 10,
+    /*   
+    객체리터럴에서는 function을 생략할 수 있음
+    attack: function(monster){
+      ...
+    }
+    */
+    attack(monster){ //화살표 함수일때 this는 객체 자신을 가르키지 않고 window를 가르킴
+      monster.hp -= this.att;
+      this.hp -= monster.att;
+    },
+    heal(monster){ // 일반 함수일 떄만 this는 객체 자신을 가르킴
+      this.hp += 20;
+      this.hp -= monster.att;
+    }
+  }
+  let monster = null; //아직 몬스터가 미등장
+  const monsterList = [
+    {name: '슬라임', hp: 25, att: 10, xp: 10},
+    {name: '스켈레톤', hp: 50, att: 15, xp: 20},
+    {name: '마왕', hp: 150, att: 35, xp: 50},
+  ];
+
+
+  startScreenTag.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const name = event.target['name-input'].value;
+    startScreenTag.style.display = 'none';
+    gameMenuTag.style.display = 'block';
+    heroNameTag.textContent = name;
+    heroLevelTag.textContent = `${hero.lev}LEV`;
+    heroHpTag.textContent = `HP: ${hero.hp} /${hero.maxHp}`;
+    heroXpTag.textContent = `XP: ${hero.xp} / ${15 * hero.lev}`;
+    heroAttTag.textContent = `ATT: ${hero.att}`;
+    hero.name = name;
+  })
+
+  gameMenuTag.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const input = event.target['menu-input'].value; //확실히 숫자라는 걸 보장하고 싶은 경우, valueAsNumber로 적어줄 것
+    if(input == '1') { // 모험
+      //input의 value는 텍스트라서 '1'
+      gameMenuTag.style.display = 'none';
+      battleMenuTag.style.display = 'block';
+      monster = JSON.parse(
+        JSON.stringify(monsterList[Math.floor(Math.random() * monsterList.length)])
+      ); // 객체의 깊은 복사, 몬스터를 뽑는 코드
+      monster.maxHp = monster.hp;
+      monsterNameTag.textContent = monster.name;
+      monsterHpTag.textContent = `HP: ${monster.hp} /${monster.maxHp}`;// 몬스터의 최대 체력과 현재 체력을 보여줌
+      monsterAttTag.textContent = `ATT: ${monster.att}`;// 몬스터 공격하기
+
+      //객체 안의 정보만 필요해서 객체를 참조하지 않고 복사함(참조할지 복사할지 결정할때)
+      const monster1 = JSON.parse(JSON.stringify(monsterList[0])); // 복사관계(하나를 바꿔도 다른게 바뀌지 않음), 깊은 복사(전체의 참조 관계가 끊김)
+      const monster2 = monsterList[1]; //참조관계(하나만 바꿔도 다른게 바뀜), 얕은 복사(밖은 참조관계가 끊기고 속성들은 참조관계)
+      const monster3 = {...monster[0]}; //객체 리터럴을 복사하는 경우 { } 안에서 하기, 얕은 복사
+      monster1.name = '새 몬스터';
+      console.log(monsterList[0].name) // 슬라임
+      monster2.name = '새 몬스터';
+      console.log(monsterList[0].name) // 새몬스터
+      console.log(monsterList[0] === monster1); // false, 깊은 복사
+      console.log(monsterList[0] === monster2); // true, 얕은 복사
+      
+    } else if ( input === '2') { //휴식
+    } else if ( input === '3') { //종료
+    }
+  });
+
+  battleMenuTag.addEventListener('submit', (event) => {
+    const input =   event.target['battle-input'].value;
+    if(input === '1') { //공격
+      hero.attack(monster); //위에서 복사한 몬스터를 공격
+      monster.attack(hero);
+      heroHpTag.textContent = `HP: ${hero.hp} / ${hero.maxHp}`;
+      monsterHpTag.textContent = `HP: ${monster.hp} / ${monster.maxHp}`;
+      messageTag.textContent = `${hero.att}의 데미지를 주고, ${monster.att}의ㅣ 데미지를 받았다.`;
+    } else if (input === '2') { // 회복
+
+    } else if (input === '2') { // 도망
+
+    }
+
+    }
+  });
+
+
+  </script>
+</body>
+</html>

@@ -29,9 +29,21 @@
     //  data.push([]);
     //}
     const data = [Array(3).fill([])];
-    const prevTurn = '';
-    const currTurn = '';
+    let turn = 'O'; //처음 턴을 O로 설정하기 위해서 변수를 만들어 저장함
     
+    const clickTd = (event) => {
+      if(event.target.textContent) {return;} 
+      //클릭을 하지 못하게 할때 removeEvnet보다 return;을 사용해서 바로 종료하기
+      event.target.textContent = turn;
+      //승부내기
+      checkWinner();
+      if(turn === 'O') { //턴이 O면
+        turn = 'X'; //X로 변경
+      } else if (turn === 'X') { 
+        turn = 'O';
+      }
+    }
+
     //테이블, 행, 열
     const table = document.createElement('table'); 
 
@@ -39,33 +51,31 @@
       const tr = document.createElement('tr');
       for(let i=0; i<3; i++) {
         const td = document.createElement('td');
-        td.addEventListener('click', clickTD);
         tr.append(td);
       }
       table.append(tr);
+      
+      //이벤트 버블링: 자식의 이벤트가 실행되면 부모까지 이벤트가 올라가서 실행되는 현상
+      // 이벤트 버블링을 실행하면 target은 td를 가르킴, 이때 currentTarget이라고 설정하면 이벤트가 설정된 table을 가르킬 수 있음
+      //이벤트 캡처링: 부모의 이벤트가 자.식한테로 전달되는 현상(팝업창 외부를 눌렀을 때 팝업창이 닫히는이벤트를 만들 때 사용, 잘 사용하지 않음)
+      table.addEventListener('click', clickTd);
     }
     document.body.append(table);
 
-    function clickTD() {
-        if(event.target.innerHTML == '') { //칸이 비어있으면
-          event.target.innerHTML = 'O'
-        } else if (event.target.innerHTML == 'O') { // 칸이 채워져있으면
-          alert('이미 클릭되었습니다. 다른 칸을 클릭해주세요 ;ㅅ;')
-        }
-    }
-
-    function decideMatch() {
-      for(let r=0; r<3; r++) {
-        for(let d=0; d<3; d++) {
-          if (data[r][d] === data[r+1][d+1] === data[r+2][d+2]) {
-            result = `${data[i][i].innerHTML} 승리`;
-            document.body.append(result);
-          }
+  
+    const checkWinner = () => {
+      for(let i=0; i<3; i++) {
+        for(let j=0; j<3; j++) {
+          const td = document.createElement('td');
+          data[i][j].push = td.textContent;
+          console.log(td.textContent);
         }
       }
+      cosole.log(data);
     }
+    
 
-    decideMatch();
+    
     
     
 
