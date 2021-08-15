@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body{
+      text-align: center;
+      position:relative;
+      margin:auto;
+    }
+    #nav{
+      margin: 50px auto;
+      width: 400px;
+      display:flex;
+      justify-content: center;
+      justify-content: space-between;
+    }
+    #title{
+      font-size: 3em;
+      color: grey;
+    }
+    #score{
+      margin-bottom:30px;
+    }
+    button{
+      background-color: lightblue;
+      border-radius:5PX;
+      padding:10px;  
+      font-size: 1em;
+    }
+    
+    #gameTable{
+      border-collapse: collapse;
+      text-align: center;
+      margin:auto; 
+    }
+    tr, td{
+        width:100px;
+        height:100px;
+        border: 10px lightblue solid;
+        background-color: rgba(176, 224, 230, 0.363) ;
+    }
+  </style>
+</head>
+<body>
+  <nav id="nav">
+    <h1 id="title">2048</h1>
+    <div id="buttons">
+      <div id="score">
+        <button>SCORE</button>
+        <button>BEST</button>
+      </div>
+      <div id="reset">
+        <button id="start">New Game</button>
+      </div>
+    </div>
+  </nav>
+  <table id="gameTable"></table>
+  <div id="result"></div>
+  
+  <script>
+  "use strict"
+
+  const row = 4; //열
+  const cell = 4; //행
+  const init = 2; //시작 숫자 개수
+  const gameTableTag = document.querySelector('#gameTable');
+  const resetTag = document.querySelector('#reset');
+  let tr; 
+  let td;
+
+  //테이블 생성
+  function createTable(){
+    for(let i=0; i<row; i++){
+      tr = document.createElement('tr');
+      for(let j=0; j<cell; j++){
+          td = document.createElement('td');
+          tr.appendChild(td);
+      }
+      gameTableTag.appendChild(tr);
+    }
+  }
+  createTable();
+
+  function startGame() {
+    //데이터 생성
+    MakeData();
+    
+    //데이터랑 화면 연결하기
+    drawDocument();
+    
+    //재시작하기
+    //resetTag.addEventListener('click', () => {
+    //})
+  }
+  startGame();
+
+  function MakeData() {
+    let data = []; //데이터를 담을 공간
+
+    for(let i=0; i<row; i++){
+      const rowIndex = [];
+      for(let j=0; j<cell; j++){
+        rowIndex.push(0);
+      }
+      data.push(rowIndex);
+    }
+
+    const random = makeRandom();
+    data[random[0][0]][random[0][1]] = '2';
+    data[random[1][0]][random[1][1]] = '2';
+    //console.log(data);
+    return data 
+  }
+
+  function makeRandom(){
+    const shuffle = [];
+    for(let i=0; i<init; i++){
+      const row = Math.floor(Math.random()*4);
+      const cell = Math.floor(Math.random()*4);
+      shuffle.push([row, cell]);
+    }
+    //console.log(shuffle) // [[0,0],[3,0]]
+    return shuffle;
+  }
+
+  function drawDocument() {
+    let data = MakeData();
+    
+    const arrTrs = Array.from(document.querySelectorAll('tr'));
+    setTimeout(()=>{
+      for(let i=0; i<row; i++){
+        for(let j=0; j<cell; j++){
+          arrTrs[i].childNodes[j].textContent = data[i][j]; //개발용 코드
+          // data[i][j] == 2 && (arrTrs[i].childNodes[j].textContent = data[i][j]) //실제 코드
+          arrTrs[i].childNodes[j].style.fontSize = '2.5em';
+          arrTrs[i].childNodes[j].style.color = 'grey';
+        }
+      }
+    },2000)
+    
+  }
+
+  //* 데이터 변경하기
+  //* 화면에 반영하기
+  function pressKey() {
+    let data = MakeData();
+    
+    window.addEventListener('keydown', (e) => {
+      if (e.keyCode == 39) { //오른쪽
+        for(let i=0; i<row; i++){
+          for(let j=0; j<cell; j++){
+            if(data[i][j] === '2' && j !== 3){
+              data[i][j] = 0;
+              data[i][3] = 2;
+              console.log(data)
+            }
+            // *옮길 수가 없으면 이벤트막기
+          }
+        }
+      } else if (e.keyCode == 37) { //왼쪽
+      } else if (e.keyCode == 38) { //위쪽
+        e.preventDefault();
+      } else if (e.keyCode == 40) { //아래쪽
+        e.preventDefault();
+
+      }
+    })
+  }
+  pressKey();
+
+
+
+ 
+
+  </script>
+</body>
+</html>
