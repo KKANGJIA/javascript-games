@@ -4,69 +4,66 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>로또 추첨기</title>
+  <title>Document</title>
   <style>
-    .ball { 
+    .ball {
       display: inline-block;
-      border:1px solid black;
+      border: 1px solid black;
       border-radius: 20px;
       width: 40px;
       height: 40px;
       line-height: 40px;
-      font-size: 20px; 
+      font-size: 20px;
       text-align: center;
       margin-right: 20px;
     }
   </style>
 </head>
 <body>
-  <div id="result">추첨결과는? </div>
+  <div id="result">추첨 결과는? </div>
   <div id="bonus">보너스: </div>
-
-
+  <div id="temp"></div>
   <script>
-    "use strict"
+    const resultTag = document.querySelector('#result'); 
+    const tempTag = document.querySelector('#temp');
+    const bonusTag = document.querySelector('#bonus');
+    let ball = 6;
+    color = ['red', 'orange', 'blue', 'green', 'yellow', 'purple', 'grey'];
 
-    //정의부
-    let choiced_balls = 0; //일반 공
-    let choiced_bonus = 0; //보너스 공
+    //피셔예이츠 셔플
+    const candidate = Array(45).fill().map((v, i) => i + 1);
+    const shuffle = [];
+    while (candidate.length > 0) {
+      const random = candidate.splice(Math.floor(Math.random() * candidate.length), 1)[0];
+      shuffle.push(random);
+    }
+    // console.log(shuffle);
 
-    const result = document.querySelector('#result');
-    const bonus = document.querySelector('#bonus');
-
-    //실행부
-    const balls = Array(45).fill().map((v, idx) => { // 공 45개를 미리 뽑기
-      return idx + 1;
+    // 6개 추려서 정렬하기
+    const balls = shuffle.slice(0, ball + 1).sort((a,b)=>a-b); // [13, 22, 30, 34, 39, 44]
+    
+    balls.map((v, i) => {
+      const ball = document.createElement('div');
+      ball.classList.add('ball');
+      ball.textContent = balls[i];
+      ball.style.backgroundColor = color[i];
+      tempTag.append(ball);
+      tempTag.style.display = 'none';
     })
 
-    const drawBall = (number, parent) => { //공 화면에 그리기
-        const ball = document.createElement('div');
-        ball.classList.add = 'ball';
-        ball.textContent = number;
-        parent.appendChild(ball);
-    };
-
-    function passSec() {
-      const sixSec = window.setInterval(() => {  //일반 공 6개를 뽑는 타이머
-        drawBall(choiced_balls, result);
-        if (balls.length <= 39) { //공의 개수가 6개가 뽑히면 
-          window.clearInterval(sixSec); // 타이머 중지
-        }
-      }, 1000);
-
-      const oneSec = window.setTimeout(() => { //보너스 공 1개를 뽑는 타이머
-        drawBall(choiced_bonus, bonus);
-        if (balls.length <= 44) { //공의 개수가 1개가 뽑히면
-          window.clearInterval(oneSec); // 타이머 중지
-        }
-      }, 7000);
+    const ballImgs = document.querySelectorAll('.ball');
+    const arrBall = Array.from(ballImgs);
+    //Array.from(ballImgs).map((v,i)=> console.log(v));
+    //setTimeout으로 Interval을 대신할 수 있다.
+    for(let i=0; i<ball; i++){
+      setTimeout(() => {
+        resultTag.append(arrBall[i]);
+      }, i * 1000);
     }
-
-    passSec();
-
-   
-
-
+  
+    setTimeout(() => {
+      bonusTag.append(arrBall[arrBall.length-1]);
+    }, ball * 1000);
   </script>
 </body>
 </html>
