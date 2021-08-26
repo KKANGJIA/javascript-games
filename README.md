@@ -4,5 +4,6 @@
 <br><br>
 
 ### lotto 추첨 배운점 
- - setInterval을 반복문내의 setTimeout으로 구현할 수 있다
+- 복습: 08/27
+- setInterval을 반복문내의 setTimeout으로 구현할 수 있다
  
